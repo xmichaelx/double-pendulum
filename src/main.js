@@ -1,34 +1,53 @@
 (function (document) {
     'use strict';
 
-    var VIEW_WIDTH = 1024,
-        VIEW_HEIGHT = 768,
+    var VIEW_WIDTH = 640,
+        VIEW_HEIGHT = 640,
         FRAMES_PER_SECOND = 60,
         HALF_WIDTH = VIEW_WIDTH / 2,
         HALF_HEIGHT = VIEW_HEIGHT / 2;
 
-    var canvas = document.getElementById('main'),
+    function createPendulum(setup) {
+        var canvas = document.getElementById(setup.canvasId),
         context = canvas.getContext('2d');
 
-    canvas.width = VIEW_WIDTH;
-    canvas.height = VIEW_HEIGHT;
+        canvas.width = VIEW_WIDTH;
+        canvas.height = VIEW_HEIGHT;
 
-    // Initial conditions [theta1, theta2, omega1, omega2]
-    var y0 = [3 * Math.PI / 4, Math.PI, 0, 0];
-    var pendulum = new Pendulum(y0, context, FRAMES_PER_SECOND);
+        return {
+            'pendulum': new Pendulum(setup.initialConditions, context, FRAMES_PER_SECOND),
+            'context': context
+        } ;
+    }
+    
+    var ids = [
+        {
+            canvasId: "canvas1",
+            initialConditions: [3 * Math.PI / 4, Math.PI, 0, 0+ 0.00001]
+        }, 
+        {
+            canvasId:  "canvas2",
+            initialConditions: [3 * Math.PI / 4, Math.PI, 0, 0]
+        }
+    ];
+    var list = ids.map(createPendulum);
 
-    setInterval(update, 1000 / FRAMES_PER_SECOND);
+    requestAnimationFrame(update);
 
     /**
      * Update loop
      */
     function update() {
-        context.setTransform(1, 0, 0, 1, 0, 0);
-        context.translate(HALF_WIDTH, HALF_HEIGHT);
-        context.clearRect(-HALF_WIDTH, -HALF_HEIGHT, VIEW_WIDTH, VIEW_HEIGHT);
+        list.forEach(x => {
+            x.context.setTransform(1, 0, 0, 1, 0, 0);
+            x.context.translate(HALF_WIDTH, HALF_HEIGHT);
+            x.context.clearRect(-HALF_WIDTH, -HALF_HEIGHT, VIEW_WIDTH, VIEW_HEIGHT);
 
-        pendulum.draw();
-        pendulum.step();
+            x.pendulum.draw();
+            x.pendulum.step();
+        });
+
+        requestAnimationFrame(update);
     }
 
 })(document);
