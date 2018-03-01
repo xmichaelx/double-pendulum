@@ -23,7 +23,7 @@
     var ids = [
         {
             canvasId: "canvas1",
-            initialConditions: [3 * Math.PI / 4, Math.PI, 0, 0+ 0.00001]
+            initialConditions: [3 * Math.PI / 4, Math.PI, 0, 0+ 10e-15]
         }, 
         {
             canvasId:  "canvas2",
